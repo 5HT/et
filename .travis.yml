@@ -11,6 +11,4 @@ notifications:
     on_failure: always  # options: [always|never|change] default: always
     on_start: always    # options: [always|never|change] default: always
 install: "./mad dep com pla bun om"
-#script: "./om extract all , test all"
-#script: "./om scan Data/Bool , mode posets"
 script: "./om test all"
