@@ -18,7 +18,7 @@ debug(S)     -> application:set_env(om,debug,atom(S)).
 debug()      -> application:get_env(om,debug,false).
 
 % constants
-allmodes()   -> ["normal","setoids", "posets"].
+allmodes()   -> ["normal"].
 modes()      -> allmodes().
 
 % providing functions
