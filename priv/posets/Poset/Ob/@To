@@ -1,8 +1,0 @@
--- #Poset/Ob/@To : ∀(El : #Poset/Ob/@El)→ #Star
-
-λ (El : #Poset/Ob/@El) →
-----
-∀ (a : El) →
-∀ (b : El) →
-----
-#Prop/=El

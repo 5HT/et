@@ -1,5 +1,0 @@
--- arg A
-λ (Carrier.El : #Data/Bool/Alg/Ob/@Carrier/@El) →
-
---
-Carrier.El
