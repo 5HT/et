@@ -1,19 +1,19 @@
-Om — Lambda Assembler
----------------------
+OM: Pure Type System for Erlang
+-------------------------------
 
 [![Build Status](https://travis-ci.org/groupoid/om.svg?branch=master)](https://travis-ci.org/groupoid/om)
 [![Gitter Chat](https://img.shields.io/gitter/room/badges/shields.svg)](https://gitter.im/groupoid/om)
 
-   An intermediate Om language is based on Henk languages described first
-   by Erik Meijer and Simon Peyton Jones in 1997. Later on in 2015 a new implementation of the ideas
-   in Haskell appeared, called Morte. It used Boehm-Berarducci encoding of recursive data types into non-recursive terms.
-   Morte has constants, variables, and kinds, is based only on *pi*, *lambda* and *apply* constructions,
-   one axiom and four deduction rules. The Om language resembles Henk and Morte both in design
-   and in implementation. This language indended to be small, concise, easily provable, clean and be able
-   to produce verifiable programs that can be distributed over the networks and compiled at target with
-   safe linkage.
+An intermediate Om language is based on Henk languages described first
+by Erik Meijer and Simon Peyton Jones in 1997. Later on in 2015 a new implementation of the ideas
+in Haskell appeared, called Morte. It used Boehm-Berarducci encoding of recursive data types into non-recursive terms.
+Morte has constants, variables, and kinds, is based only on *pi*, *lambda* and *apply* constructions,
+one axiom and four deduction rules. The Om language resembles Henk and Morte both in design
+and in implementation. This language indended to be small, concise, easily provable, clean and be able
+to produce verifiable programs that can be distributed over the networks and compiled at target with
+safe linkage.
 
-   The Om Systax is the following:
+The OM Systax is the following:
 
 ```
    <> ::= #option
@@ -31,8 +31,8 @@ OM is an implementation of PTS with Infinite Number of Universes,
 the pure lambda calculus with dependent types. It can be compiled (code extraction) to bytecode
 of Erlang virtual machines BEAM and LING.
 
-OM — Trusted PTS with Infinite Universes
-----------------------------------------
+Trusted PTS with Infinite Universes
+-----------------------------------
 
 In repository OM you may found following parts of core:
 
