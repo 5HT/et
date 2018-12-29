@@ -8,9 +8,9 @@
 -define(reason2, "syntax violation").
 -define(reason3, "wrong function definition").
 
-expr(P,[],                 [{':',X}],{V,D}) ->      {error,{?reason3,X}};
-expr(P,[],                         A,{V,D}) ->      rewind(A,{V,D},[]);
-expr(P,[close                 |T], A,{V,D}) -> case rewind(A,{D,D},[]) of
+expr(_,[],                 [{':',X}],{_,_}) ->      {error,{?reason3,X}};
+expr(_,[],                         A,{V,D}) ->      rewind(A,{V,D},[]);
+expr(P,[close                 |T], A,{_,D}) -> case rewind(A,{D,D},[]) of
                                                     {error,R} -> {error,R};
                                                     {{V1,D1},A1} -> expr(P,T,A1,{V1,D1}) end;
 
@@ -22,7 +22,7 @@ expr(P,[{N,X}                 |T], Acc, {V,D}) when ?noh(N)   -> expr(P,T,[{N,X}
 expr(P,[open                  |T], Acc, {V,D})                -> expr(P,T,[{open}|Acc],{V,D+1});
 expr(P,[box                   |T], Acc, {V,D})                -> expr(P,T,[{star,2}|Acc],{V,D});
 expr(P,[arrow                 |T], Acc, {V,D})                -> expr(P,T,[{arrow}|Acc],{V,D});
-expr(P,[X                     |T], Acc, {V,D})                -> {error,{?reason1,hd(lists:flatten([X|T]))}}.
+expr(_,[X                     |T], _cc, {_,_})                -> {error,{?reason1,hd(lists:flatten([X|T]))}}.
 
 rewind([],                      {V,D},       R)  -> {{V,D},om:flat(R)};
 rewind([{':',_}|_]=A,           {V,D},       R)  -> {{V,D},om:flat([R|A])};
@@ -30,7 +30,7 @@ rewind([{'$',M}|A],             {V,D},[{C,X}|R]) -> rewind([{':',{M,{C,X}}}|A],{
 rewind([{arrow},{':',{M,I}} |A],{V,D},[{C,X}|R]) -> rewind([{M,{I,{C,X}}}|A],{V,D},R);
 rewind([{arrow},{B,Y}       |A],{V,D},[{C,X}|R]) -> rewind([{func(arrow),{{B,Y},{C,X}}}|A],{V,D},R);
 rewind([{C,X},{'$',M}|A],{V,D},R) when V == D    -> rewind([{':',{M,{C,X}}}|A],{V,D},R);
-rewind([{C,X},{'$',M}|_]=A,          {V,D},  R)  -> {{V,D},  om:flat([A|R])};
+rewind([{_,_},{'$',_}|_]=A,          {V,D},  R)  -> {{V,D},  om:flat([A|R])};
 rewind([{C,X},{open},{':',{M,I}} |A],{V,D},  R)  -> {{V,D-1},om:flat([{C,X},{':',{M,I}}  |[R|A]])};
 rewind([{C,X},{open},{'$',M}     |A],{V,D},  R)  -> {{V,D-1},om:flat([{C,X},{'$',M}      |[R|A]])};
 rewind([{C,X},{open},{open}      |A],{V,D},  R)  -> {{V,D-1},om:flat([{C,X},{open}       |[R|A]])};
@@ -39,8 +39,8 @@ rewind([{C,X},{open}|A],{V,D},               R)  -> {{V,D-1},om:flat([{C,X}|[R|A
 rewind([{C,X},{arrow},{':',{M,I}}|A],{V,D},  R)  -> rewind([{M,{I,{C,X}}}|A],{V,D},R);
 rewind([{C,X},{arrow},{B,Y} |A],{V,D},       R)  -> rewind([{func(arrow),{{B,Y},{C,X}}}|A],{V,D},R);
 rewind([{C,X},{B,Y}|A], {V,D}, R) when ?nah(C,B) -> rewind([{app,{{B,Y},{C,X}}}|A],{V,D},R);
-rewind([{C,X}]=A,         {V,D}, R) when ?noh(A) -> {{V,D},om:flat([R|A])};
-rewind(A,                 {V,D}, R)              -> {error,{?reason2,hd(lists:flatten([R|A]))}}.
+rewind([{_,_}]=A,         {V,D}, R) when ?noh(A) -> {{V,D},om:flat([R|A])};
+rewind(A,                 {_,_}, R)              -> {error,{?reason2,hd(lists:flatten([R|A]))}}.
 
 % Syntax and Algorithm
 
@@ -82,13 +82,13 @@ test() -> F = [ "(x : ( \\ (o:*) -> o ) -> p ) -> o",        % colon
 
 pad(D)                         -> lists:duplicate(D,"  ").
 
-print(any,D)                   -> ["any"];
-print(none,D)                  -> ["none"];
-print({remote,L},D)            -> ["#", om:cat([L]) ];
-print({var,{N,0}},D)           -> [ om:cat([N]) ];
-print({var,{N,I}},D)           -> [ om:cat([N]), "@", integer_to_list(I) ];
-print({star,2},D)              -> [ "[]" ];
-print({star,N},D)              -> [ "*",om:cat([N]) ];
+print(any,_)                   -> ["any"];
+print(none,_)                  -> ["none"];
+print({remote,L},_)            -> ["#", om:cat([L]) ];
+print({var,{N,0}},_)           -> [ om:cat([N]) ];
+print({var,{N,I}},_)           -> [ om:cat([N]), "@", integer_to_list(I) ];
+print({star,2},_)              -> [ "[]" ];
+print({star,N},_)              -> [ "*",om:cat([N]) ];
 print({"→",{I,O}},D)           -> [ "(", print(I,D+1),"\n",pad(D),"→ ",print(O,D), ")\n" ];
 print({app,{I,O}},D)           -> [ "(", print(I,D)," ",print(O,D),")" ];
 print({{"∀",{N,_}},{any,O}},D) -> [ "( ∀ ", om:cat([N]),"\n",pad(D),"→ ",print(O,D),")" ];

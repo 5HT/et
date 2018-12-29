@@ -3,7 +3,7 @@
 -behaviour(supervisor).
 -include("om.hrl").
 -behaviour(application).
--export([init/1, start/2, stop/1]).
+-export([init/1, start/2, stop/1,main/1]).
 -compile(export_all).
 
 % env
@@ -39,10 +39,10 @@ erase(T,C)   -> om_erase:erase(T,C).
 modes(_)     -> modes().
 allmodes(_)  -> allmodes().
 priv(Mode)   -> lists:concat([privdir(),"/",Mode]).
-name(M,[])   -> priv(mode());
-name(M,F)    -> string:join([priv(mode()),F],"/").
+name(_,[])   -> priv(mode());
+name(_,F)    -> string:join([priv(mode()),F],"/").
 name(M,[],F) -> name(M,F);
-name(M,P,F)  -> string:join([priv(mode()),P,F],"/").
+name(_,P,F)  -> string:join([priv(mode()),P,F],"/").
 tokens(B)    -> om_tok:tokens([],B,0,{1,[]},[]).
 str(F)       -> tokens(unicode:characters_to_binary(F)).
 read(F)      -> tokens(file(F)).
@@ -63,7 +63,7 @@ parse(T,C)   -> om_parse:expr(T,read(name(mode(),T,C)),[],{0,0}).
 % system functions
 
 convert(A,S, nt) -> convert(A,S);
-convert(A,S, _)  -> A.
+convert(A,_, _)  -> A.
 
 convert([],Acc) -> rev(Acc);
 convert([$>|T],Acc) -> convert(T,[61502|Acc]);
@@ -72,9 +72,9 @@ convert([$:|T],Acc) -> convert(T,[61498|Acc]);
 convert([$||T],Acc) -> convert(T,[61564|Acc]);
 convert([H|T],Acc)  -> convert(T,[H|Acc]).
 
-on_compile(App, [_,Type,Ctor|_]) ->
+on_compile(_App, [_,Type,Ctor|_]) ->
     [ ets:delete(X,lists:concat([Type,"/",Ctor])) || X <- [term, type, norm]];
-on_compile(App, Rest) -> ok.
+on_compile(_App, _Rest) -> ok.
 
 opt()        -> [ set, named_table, { keypos, 1 }, public ].
 tables()     -> [ term, norm, type, erased ].
@@ -102,8 +102,8 @@ console(S)   -> boot(),
 
 % test suite
 
-typed(X)     -> try Y = om:type(X),  {X,[]} catch E:R -> {X,typed}  end.
-erased(X)    -> try A = om:erase(X), {A,[]} catch E:R -> {X,erased} end.
+typed(X)     -> try _ = om:type(X),  {X,[]} catch _:_ -> {X,typed}  end.
+erased(X)    -> try A = om:erase(X), {A,[]} catch _:_ -> {X,erased} end.
 parsed(F)    -> case parse([],pname(F)) of {_,[X]} -> {X,[]}; _ -> {F,parsed} end.
 pipe(L)      -> io:format("[~tp]~n",[L]), % workaround for trevis timeout break
                 lists:foldl(fun(X,{A,D}) ->
@@ -116,7 +116,7 @@ all()        -> X = lists:flatten([ begin om:restart(), om:mode(M), om:scan() en
                 X.
 syscard(P)   -> [ {F} || F <- filelib:wildcard(name(mode(),P,"**/*")), filelib:is_dir(F) /= true ].
 wildcard(P)  -> Q = om:name(mode(),P), lists:flatten([ {A}
-                     || {A,B} <- ets:tab2list(filesystem), lists:sublist(A,length(Q)) == Q ]).
+                     || {A,_} <- ets:tab2list(filesystem), lists:sublist(A,length(Q)) == Q ]).
 scan()       -> scan([]).
 scan(P)      -> Res = [ { flat(element(2,pipe(F))), lists:concat([tname(F),"/",cname(F)])}
                      || {F} <- lists:umerge(wildcard(P),syscard(P)),
@@ -126,7 +126,7 @@ scan(P)      -> Res = [ { flat(element(2,pipe(F))), lists:concat([tname(F),"/",c
 test(_)      -> All = om:all(),
                 io:format("~tp~n",[om_parse:test()]),
                 io:format("~tp~n",[All]),
-                case lists:all(fun({Mode,Status,Tests}) -> Status == om:pass(0) end, All) of
+                case lists:all(fun({_Mode,Status,_Tests}) -> Status == om:pass(0) end, All) of
                      true  -> 0;
                      false -> put(ret,1),1 end .
 

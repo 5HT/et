@@ -2,7 +2,7 @@
 -description('Type Checker').
 -compile(export_all).
 
-dep(Arg,Out,impredicative) -> Out;
+dep(_Arg,Out,impredicative) -> Out;
 dep(Arg,Out,predicative)   -> max(Arg,Out).
 
 hierarchy(Arg,Out)         -> dep(Arg,Out,application:get_env(om,hierarchy,impredicative)).
@@ -10,18 +10,18 @@ hierarchy(Arg,Out)         -> dep(Arg,Out,application:get_env(om,hierarchy,impre
 star({star,N})          -> N;
 star(S)                 -> erlang:error({error, "*", S}).
 
-func({{"∀",N},{I,O}})   -> true;
+func({{"∀",_},{_,_}})   -> true;
 func(T)                 -> erlang:error({error, "∀", T }).
 
 var(N,B)                -> var(N,B,proplists:is_defined(N,B)).
-var(N,B,true)           -> true;
+var(_,_,true)           -> true;
 var(N,B,false)          -> erlang:error({error, "free var", N, proplists:get_keys(B) }).
 
 shift({var,{N,I}},N,P) when I>=P -> {var,{N,I+1}};
 shift({{"∀",{N,0}},{I,O}},N,P)   -> {{"∀",{N,0}},{shift(I,N,P),shift(O,N,P+1)}};
 shift({{"λ",{N,0}},{I,O}},N,P)   -> {{"λ",{N,0}},{shift(I,N,P),shift(O,N,P+1)}};
 shift({Q,{L,R}},N,P)             -> {Q,{shift(L,N,P),shift(R,N,P)}};
-shift(T,N,P)                     -> T.
+shift(T,_,_)                     -> T.
 
 
 subst(Term,Name,Value)           -> subst(Term,Name,Value,0).
@@ -32,7 +32,7 @@ subst({{"λ",{N,0}},{I,O}},N,V,L) -> {{"λ",{N,0}},{subst(I,N,V,L),subst(O,N,shi
 subst({{"λ",{F,X}},{I,O}},N,V,L) -> {{"λ",{F,X}},{subst(I,N,V,L),subst(O,N,shift(V,F,0),L)}};
 subst({app, {F,A}},       N,V,L) -> {app,        {subst(F,N,V,L),subst(A,N,V,L)}};
 subst({var, {N,L}},       N,V,L) -> V;                       % index match
-subst({var, {N,I}},       N,V,L) when I>L -> {var, {N,I-1}}; % unshift
+subst({var, {N,I}},       N,_,L) when I>L -> {var, {N,I-1}}; % unshift
 subst(T,       _,_,_)            -> T.
 
 norm(none)                          -> none;
@@ -41,7 +41,7 @@ norm({"→",        {I,O}})           -> {{"∀",{'_',0}},{norm(I),norm(O)}};
 norm({{"∀",{N,0}},{I,O}})           -> {{"∀",{N,0}},  {norm(I),norm(O)}};
 norm({{"λ",{N,0}},{I,O}})           -> {{"λ",{N,0}},  {norm(I),norm(O)}};
 norm({app,{F,A}})                   -> case norm(F) of
-                                            {{"λ",{N,0}},{I,O}} -> norm(subst(O,N,A));
+                                            {{"λ",{N,0}},{_,O}} -> norm(subst(O,N,A));
                                                              NF -> {app,{NF,norm(A)}} end;
 norm({remote,N})                    -> om:cache(norm,N,[]);
 norm(T)                             -> T.

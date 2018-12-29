@@ -14,14 +14,14 @@
 tokens(P,<<>>,                    _, {_,C}, Acc)  -> om:rev(stack(P,C,Acc));
 tokens(P,<<"--"/utf8, R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{c,[]},     stack(P,C,Acc));
 tokens(P,<<$\n,       R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L+1,{1,[]},   stack(P,C,Acc));
-tokens(P,<<X,         R/binary>>, L, {c,C}, Acc)  -> tokens(P,R,L,{c,[]},     Acc);
+tokens(P,<<_,         R/binary>>, L, {c,_}, Acc)  -> tokens(P,R,L,{c,[]},     Acc);
 tokens(P,<<"->"/utf8, R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{1,[]},     [arrow  | stack(P,C,  Acc)]);
 tokens(P,<<$(,        R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{t,[]},     [open   | stack(P,C,  Acc)]);
 tokens(P,<<$),        R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{t,[]},     [close  | stack(P,C,  Acc)]);
 tokens(P,<<$*,        R/binary>>, L, {a,C}, Acc)  -> tokens(P,R,L,{a,[$*|C]}, Acc);
-tokens(P,<<$*,        R/binary>>, L, {X,C}, Acc)  -> tokens(P,R,L,{n,{star,C}},        stack(P,C,Acc));
+tokens(P,<<$*,        R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{n,{star,C}},        stack(P,C,Acc));
 tokens(P,<<X,         R/binary>>, L, {n,{S,C}}, Acc) when ?is_num(X)  -> tokens(P,R,L,{n,{S,[X|C]}}, Acc);
-tokens(P,<<X,         R/binary>>, L, {n,{S,C}}, Acc)  -> tokens(P,R,L,{1,[]}, stack(P,{S,[C]},Acc));
+tokens(P,<<_,         R/binary>>, L, {n,{S,C}}, Acc)  -> tokens(P,R,L,{1,[]}, stack(P,{S,[C]},Acc));
 tokens(P,<<$:,        R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{1,[]},     [colon  | stack(P,C,  Acc)]);
 tokens(P,<<"□"/utf8,  R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{1,[]},     [box    | stack(P,C,  Acc)]);
 tokens(P,<<"→"/utf8,  R/binary>>, L, {_,C}, Acc)  -> tokens(P,R,L,{1,[]},     [arrow  | stack(P,C,  Acc)]);
@@ -37,7 +37,7 @@ tokens(P,<<X,         R/binary>>, L, {t,C}, Acc) when ?is_termi(X) -> tokens(P,R
 tokens(P,<<X,         R/binary>>, L, {_,C}, Acc) when ?is_termi(X) -> tokens(P,R,L,{t,[X]},  stack(P,C, [Acc]));
 tokens(P,<<X,         R/binary>>, L, {_,C}, Acc) when ?is_space(X) -> tokens(P,R,L,{s,[C]},              Acc).
 
-stack(P,{_,C},Ac) -> index(C,Ac);
+stack(_,{_,C},Ac) -> index(C,Ac);
 stack(P,C,Ac) -> case om:rev(om:flat(C)) of [] -> Ac;
                                          "(" -> [open|Ac];
                                          ")" -> [close|Ac];

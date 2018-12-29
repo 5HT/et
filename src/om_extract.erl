@@ -9,7 +9,7 @@ scan() -> Root = "priv/",
 replace(X,Y,Z) -> string:join(string:tokens(X,Y),Z).
 name(X,F) -> om:cat([X,"/",lists:flatten([F|[]])]).
 normal("",X) -> om:cname(X);
-normal(A,X)  -> A.
+normal(A,_)  -> A.
 
 extr(X) -> om:restart(), om:mode(X), extract("priv/"++X).
 extract(X)  ->  O = replace(om:pname(X),"/","."),
@@ -23,18 +23,18 @@ extract(X)  ->  O = replace(om:pname(X),"/","."),
                 [  extract(name(X,Subdir)) || Subdir <- om:snd(file:list_dir(X)), filelib:is_dir(name(X,Subdir)) ],
                 ok.
 
-save(X,Forms) -> case compile:forms(om:flat(Forms),[debug_info]) of
+save(_,Forms) -> case compile:forms(om:flat(Forms),[debug_info]) of
                  {ok,Name,Bin} -> file:write_file(om:cat([ebin,"/",Name,".beam"]),Bin);
-                 Error -> om:info(?MODULE,"Extract Error: ~p~n",[Forms]) end.
+                 _Error -> om:info(?MODULE,"Extract Error: ~p~n",[Forms]) end.
 
 extract(F,T,C) -> case ext(F,T,C) of
                        [] -> [];
                        Ex -> {function,C,om:atom(F),0,[{clause,C,[],[],[Ex]}]} end.
 
-ext(F,[],N)                       -> [];
-ext(F,{{"∀",Name},{_,Out}},N)     -> [];
-ext(F,{"→",{_,Out}},N)            -> [];
+ext(_,[],_)                       -> [];
+ext(_,{{"∀",_Name},{_,_Out}},_N)  -> [];
+ext(_,{"→",{_,_Out}},_N)          -> [];
 ext(F,{{"λ",{Name,_}},{_,Out}},N) -> {'fun', N,{clauses,[{clause,N,[{var,N,Name}],[],[ext(F,Out,N)]}]}};
 ext(F,{app,{A,B}},N)              -> {'call',N,ext(F,A,N),[ext(F,B,N)]};
-ext(F,{var,{Name,I}},N)           -> {'var', N,Name};
-ext(F,_,N)                        -> [].
+ext(_,{var,{Name,_}},N)           -> {'var', N,Name};
+ext(_,_,_)                        -> [].

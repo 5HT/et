@@ -4,11 +4,11 @@
 -compile(export_all).
 -define(is_fun(F), F == "∀"; F== "λ").
 
-univ({star,N})        -> true;
-univ({{"∀",N},{I,O}}) -> univ(O);
+univ({star,_})        -> true;
+univ({{"∀",_},{_,O}}) -> univ(O);
 univ(_)               -> false.
 
-erase({box,N},_)             -> {none,{star,3}};
+erase({box,_},_)             -> {none,{star,3}};
 erase({star,N},_)            -> {none,{star,N+1}};
 erase({var,{N,I}},D)         -> true = var(N,D),
                                 T = om:keyget(N,D,I),

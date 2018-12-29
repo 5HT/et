@@ -6,8 +6,10 @@ Developers
 
 ```
 $ git clone git://github.com/groupoid/om && cd om
-$ make
-$ ./mad sh
+$ curl -fsSL https://raw.github.com/synrc/mad/master/mad > mad
+$ chmod +x mad"
+$ ./mad dep com pla bun om
+$ ./om
 ```
 
 Session example with Om:

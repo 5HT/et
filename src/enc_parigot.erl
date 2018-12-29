@@ -26,8 +26,8 @@ ap1(Fun,Arg) -> Fun(Arg).
 % 0
 
 bool   () ->      [ begin io:format("TRUE~n"), "true" end, begin io:format("FALSE~n"), "false" end].
-true   () ->       fun (T) -> fun (F) -> io:format("true called~n"), T end end.
-false  () ->       fun (T) -> fun (F) -> io:format("false called~n"), F end end.
+true   () ->       fun (T) -> fun (_) -> io:format("true called~n"), T end end.
+false  () ->       fun (_) -> fun (F) -> io:format("false called~n"), F end end.
 
             bool(F) -> ?MODULE:F().
             unbool(X) -> ap(X,bool()).
@@ -37,10 +37,10 @@ false  () ->       fun (T) -> fun (F) -> io:format("false called~n"), F end end.
 %        (pr2: *)
 
 prod  () ->       [fun (A) -> fun (B)->  {prod,A,B} end end].
-prodid () ->                  fun (X) -> fun (Mk) -> X end end.
+prodid () ->                  fun (X) -> fun (_Mk) -> X end end.
 mk     () ->       fun (A) -> fun (B) -> fun (Mk) -> ap(Mk,[ap(A,[Mk]),ap(B,[Mk])]) end end end.
-pr1    () ->       [fun (A) -> fun (B) -> A end end].
-pr2    () ->       [fun (A) -> fun (B) -> B end end].
+pr1    () ->       [fun (A) -> fun (_) -> A end end].
+pr2    () ->       [fun (_) -> fun (B) -> B end end].
 
             prod({A,B}) -> ap(mk(),[ap(prodid(),[A]),ap(prodid(),[B])]).
             unprod(X) -> ap(X,prod()).
@@ -56,7 +56,7 @@ pr2    () ->       [fun (A) -> fun (B) -> B end end].
 %        (io: * → * → proto)
 
 ret    () ->           [fun (X) -> {ok,X} end, fun (X) -> {error,X} end, fun(X) -> fun (Y) -> {io,X,Y} end end].
-retid  () ->            fun (R) -> fun (Ok) -> fun (Error) -> fun (Io) -> R end end end end.
+retid  () ->            fun (R) -> fun (_Ok) -> fun (_Error) -> fun (_Io) -> R end end end end.
 ok     () ->            fun (V) -> fun (Ok) -> fun (Error) -> fun (Io) -> ap(Ok,   [ap(V,[Ok,Error,Io])]) end end end end.
 error  () ->            fun (V) -> fun (Ok) -> fun (Error) -> fun (Io) -> ap(Error,[ap(V,[Ok,Error,Io])]) end end end end.
 io     () -> fun (X) -> fun (Y) -> fun (Ok) -> fun (Error) -> fun (Io) -> ap(Io,   [ap(X,[Ok,Error,Io]),ap(Y,[Ok,Error,Io])]) end end end end end.
@@ -71,7 +71,7 @@ io     () -> fun (X) -> fun (Y) -> fun (Ok) -> fun (Error) -> fun (Io) -> ap(Io,
 
 nat_   () ->                        [fun (Succ) -> 1 + Succ end, 0 ].
 nat    () ->                        [fun (Succ) -> {succ,Succ} end, zero].
-zero   () ->                         fun (Succ) -> fun (Zero) -> Zero end end.
+zero   () ->                         fun (_Succ) -> fun (Zero) -> Zero end end.
 succ   () ->            fun (Nat) -> fun (Succ) -> fun (Zero) -> Succ((Nat(Succ))(Zero)) end end end.
                                                                  %ap(Succ,[ap(Nat,[Succ,Zero])]) end end end.
 
@@ -88,7 +88,7 @@ succ   () ->            fun (Nat) -> fun (Succ) -> fun (Zero) -> Succ((Nat(Succ)
 
 list_  () ->                            [fun (H) -> fun (T) -> [H|T] end end, [] ].
 list   () ->                            [fun (H) -> fun (T) -> {cons,H,T} end end, nil].
-nil    () ->                             fun (Cons) -> fun (Nil) -> Nil end end.
+nil    () ->                             fun (_Cons) -> fun (Nil) -> Nil end end.
 cons   () -> io:format("CONS~n"),
          fun (Head) -> fun (Tail) -> fun (Cons) -> fun (Nil) -> ((Cons(Head))((Tail(Cons))(Nil))) end end end end.
                                                                     % ap(Cons,[Head,ap(Tail,[Cons,Nil])]) end end end end.
@@ -125,17 +125,17 @@ main  ()  -> io:format("Zero: ~p~n",               [unnat(zero())]),
              io:format("Two: ~p~n",                [unnat(ap(succ(),[ap(succ(),[zero()])]))]).
 
 unnat1(N) -> ap(N,nat1()).
-nat1() -> [fun(A) -> fun(B) -> ap(B,nat1()) + 1 end end, 0].
-nat2() -> [fun(A) -> fun(B) -> {succ,ap(B,nat2())} end end, zero].
-zero1() -> fun (F) -> fun (X) -> X end end.
+nat1() -> [fun(_) -> fun(B) -> ap(B,nat1()) + 1 end end, 0].
+nat2() -> [fun(_) -> fun(B) -> {succ,ap(B,nat2())} end end, zero].
+zero1() -> fun (_) -> fun (X) -> X end end.
 %succ1() -> fun (Z) -> fun (F) -> fun (X) ->
 %           (F(fun (F1) -> fun(X1) -> F((Z(F1))(X1)) end end))(Z) end end end.
-succ1() -> fun (Z) -> fun (F) -> fun (X) -> (F(Z))(Z) end end end.
+succ1() -> fun (Z) -> fun (F) -> fun (_) -> (F(Z))(Z) end end end.
 
-one1()   -> fun (F) -> fun (X) -> (F(fun (F1) -> fun(X1) -> F1(X1) end end))(zero1()) end end.
-two1()   -> fun (F) -> fun (X) -> (F(fun (F1) -> fun(X1) -> F1(F1(X1)) end end))(one1()) end end.
-three1() -> fun (F) -> fun (X) -> (F(fun (F1) -> fun(X1) -> F1(F1(F1(X1))) end end))(two1()) end end.
-four1()  -> fun (F) -> fun (X) -> (F(fun (F1) -> fun(X1) -> F1(F1(F1(F1(X1)))) end end))(three1()) end end.
+one1()   -> fun (F) -> fun (_) -> (F(fun (F1) -> fun(X1) -> F1(X1) end end))(zero1()) end end.
+two1()   -> fun (F) -> fun (_) -> (F(fun (F1) -> fun(X1) -> F1(F1(X1)) end end))(one1()) end end.
+three1() -> fun (F) -> fun (_) -> (F(fun (F1) -> fun(X1) -> F1(F1(F1(X1))) end end))(two1()) end end.
+four1()  -> fun (F) -> fun (_) -> (F(fun (F1) -> fun(X1) -> F1(F1(F1(F1(X1)))) end end))(three1()) end end.
 pred1()  -> begin
             fun (N) -> (N(fun (_) -> fun(Pred) -> 
             io:format("TICK~n"),

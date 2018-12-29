@@ -12,6 +12,14 @@ and in implementation. This language indended to be small, concise, easily prova
 to produce verifiable programs that can be distributed over the networks and compiled at target with
 safe linkage.
 
+
+```
+$ curl -fsSL https://raw.github.com/synrc/mad/master/mad > mad
+$ chmod +x mad"
+$ ./mad dep com pla bun om
+
+```
+
 The OM Systax is the following:
 
 ```
@@ -51,16 +59,14 @@ and two basic (co)monadic effect systems: IO (free monad, for finite I/O) and IO
 for infinitary I/O, long-term processes). The generated code is being sewed with
 Erlang effects that are passed as parameters to pure functions.
 
-###
-
 Note: all these folders (modules) are encoded in plain CoC in OM repository to demonstrate
-you the basic principles how things work. Later all these should be written in EXE languages and translated to OM
-automatically. You may think of OM as the low-level typed assembler of type theory.
+you the basic principles how things work. Later all these should be written in EXE
+languages and translated to OM automatically. You may think of OM as the low-level
+typed assembler of type theory.
 
 Credits
 -------
 
 * Maxim Sokhatsky
-* Andy Melnikov
 
 OM A HUM
