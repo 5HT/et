@@ -1,8 +1,7 @@
 OM: Pure Type System for Erlang
 -------------------------------
 
-[![Build Status](https://travis-ci.org/groupoid/om.svg?branch=master)](https://travis-ci.org/groupoid/om)
-[![Gitter Chat](https://img.shields.io/gitter/room/badges/shields.svg)](https://gitter.im/groupoid/om)
+[![Build Status](https://travis-ci.org/groupoid/pts.svg?branch=master)](https://travis-ci.org/groupoid/pts)
 
 An intermediate Om language is based on Henk languages described first
 by Erik Meijer and Simon Peyton Jones in 1997. Later on in 2015 a new implementation of the ideas
