@@ -1,4 +1,4 @@
-OM: Pure Type System for Erlang
+PTS: Pure Type System for Erlang
 -------------------------------
 
 [![Build Status](https://travis-ci.org/groupoid/pts.svg?branch=master)](https://travis-ci.org/groupoid/pts)
@@ -20,7 +20,7 @@ $ ./mad dep com pla bun om
 
 ```
 
-The OM Systax is the following:
+The PTS Systax is the following:
 
 ```
    <> ::= #option
@@ -48,7 +48,7 @@ In repository OM you may found following parts of core:
 * [Eraser](https://github.com/groupoid/om/blob/master/src/om_erase.erl)
 * [Code Extractor](https://github.com/groupoid/om/blob/master/src/om_extract.erl)
 
-OM ships with different "modes" (spaces of types with own encodings), or "preludes", which
+PTS ships with different "modes" (spaces of types with own encodings), or "preludes", which
 you may find in `priv` directory. They are selectable with `om:mode("normal")`.
 
 #### [normal](https://github.com/groupoid/om/tree/master/priv/normal)
