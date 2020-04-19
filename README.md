@@ -1,7 +1,7 @@
 PTS: Pure Type System for Erlang
 -------------------------------
 
-[![Build Status](https://travis-ci.org/groupoid/pts.svg?branch=master)](https://travis-ci.org/groupoid/pts)
+[![Build Status](https://travis-ci.org/groupoid/pure.svg?branch=master)](https://travis-ci.org/groupoid/pure)
 
 An intermediate Om language is based on Henk languages described first
 by Erik Meijer and Simon Peyton Jones in 1997. Later on in 2015 a new implementation of the ideas
